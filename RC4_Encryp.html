@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RC4 Encryption-Decryption</title>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    width: 80%;
+    margin: 0 auto;
+    text-align: center;
+}
+
+textarea {
+    width: 100%;
+    height: 100px;
+    margin-bottom: 10px;
+    padding: 5px;
+}
+
+input[type="text"] {
+    width: 100%;
+    padding: 5px;
+    margin-bottom: 10px;
+}
+
+button {
+    padding: 10px 20px;
+    background-color: #bb710b;
+    color: #ffffff;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #ad8201;
+}
+
+#output {
+    resize: none;
+}
+
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h2>RC4 Encryption-Decryption</h2>
+
+    <textarea id="input" placeholder="Masukkan pesan di sini"></textarea>
+    <input type="text" id="key" placeholder="Masukkan kunci di sini"><br><br>
+
+    <button onclick="encrypt()">Enkripsi</button>
+    <button onclick="decrypt()">Dekripsi</button><br><br>
+
+    <textarea id="output" placeholder="Hasil akan muncul di sini"></textarea>
+</div>
+
+<script>
+function encrypt() {
+    var message = document.getElementById("input").value;
+    var key = document.getElementById("key").value;
+    
+    var encrypted_message = rc4_encrypt(message, key);
+    
+    document.getElementById("output").value = encrypted_message;
+}
+
+function decrypt() {
+    var ciphertext = document.getElementById("input").value;
+    var key = document.getElementById("key").value;
+    
+    var decrypted_message = rc4_decrypt(ciphertext, key);
+    
+    document.getElementById("output").value = decrypted_message;
+}
+
+function rc4_encrypt(message, key) {
+    var cipher = new ARC4(key);
+    var encrypted_message = cipher.encrypt(message);
+    return encrypted_message;
+}
+
+function rc4_decrypt(ciphertext, key) {
+    var cipher = new ARC4(key);
+    var decrypted_message = cipher.decrypt(ciphertext);
+    return decrypted_message;
+}
+
+// Implementasi Algoritma RC4
+function ARC4(key) {
+    var s = [], j = 0, x, i;
+    for (i = 0; i < 256; i++) {
+        s[i] = i;
+    }
+    for (i = 0; i < 256; i++) {
+        j = (j + s[i] + key.charCodeAt(i % key.length)) % 256;
+        x = s[i];
+        s[i] = s[j];
+        s[j] = x;
+    }
+    this.encrypt = function (plaintext) {
+        var i = 0, j = 0, x, res = '', cipher;
+        for (var y = 0; y < plaintext.length; y++) {
+            i = (i + 1) % 256;
+            j = (j + s[i]) % 256;
+            x = s[i];
+            s[i] = s[j];
+            s[j] = x;
+            res += String.fromCharCode(plaintext.charCodeAt(y) ^ s[(s[i] + s[j]) % 256]);
+        }
+        return res;
+    };
+    this.decrypt = this.encrypt;
+}
+</script>
+
+</body>
+</html>
